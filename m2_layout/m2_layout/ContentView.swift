@@ -1,7 +1,4 @@
-
 import SwiftUI
-
-
 
 struct ContentView: View {
     
@@ -13,6 +10,8 @@ struct ContentView: View {
     @State private var title = "Выход"
     @State private var informText = "Вы уверены, что хотите выйти?"
     @State private var isShowingDialog = false
+    @State private var showNewsToggle = false
+    @State private var showFriendsUpdatesToggle = false
     
     enum Sex: String, CaseIterable, Identifiable {
         var id: Self {self}
@@ -29,20 +28,25 @@ struct ContentView: View {
                     TextField("ИМЯ", text: $firstName)
                     TextField("ФАМИЛИЯ", text: $secondName)
                     DatePicker("Дата рождения", selection: $dateBirth, displayedComponents: [.date])
-                    Picker("Пол", selection: $sex) {
-                        Text(Sex.male.rawValue.capitalized).tag(Sex.male)
-                        Text(Sex.female.rawValue.capitalized).tag(Sex.female)
+                    NavigationLink(destination: SexSelectionView(selectedSex: $sex)) {
+                        Text("Пол: \(sex.rawValue)")
                     }
                 }
-                Section(header: Text("НОТИФИКАЦИЯ")) {
+                
+                Section(header: Text("НОТИФИКАЦИИ")) {
+
                     Toggle("Получать нотификации", isOn: $isOn)
-                        .padding(0)
-                        .toggleStyle(.switch)
-                    if isOn == true {
-                        Text("Новости")
-                        Text("Обновления друзей")
+
+                    if isOn {
+
+                        Toggle("Новости", isOn: $showNewsToggle)
+
+                        Toggle("Обновления друзей", isOn: $showFriendsUpdatesToggle)
+
                     }
+
                 }
+
                 Section(header: Text("Документы")) {
                     Button ("Личные данные", action: {
                         
@@ -67,10 +71,27 @@ struct ContentView: View {
             }
             .padding(0)
         }
-//        Button ("Мужской", action: {
-//            print(sex.rawValue)
-//        })
+
     }
+}
+
+struct SexSelectionView: View {
+    
+    @Binding var selectedSex: ContentView.Sex
+    
+    var body: some View {
+        List(ContentView.Sex.allCases) { sex in
+            Button(action: {
+                selectedSex = sex
+            }) {
+                Text(sex.rawValue)
+                    .foregroundColor(selectedSex == sex ? .blue : .primary)
+            }
+        }
+        .navigationBarTitle("Выберите пол")
+    }
+    
+    
 }
 
 #Preview {
